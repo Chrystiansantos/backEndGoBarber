@@ -31,7 +31,7 @@ class User extends Model {
     /* this.belongsTo(aqui vou informar o nome do model que ira relacionar com user,{
       foreignKey: 'nome da coluna na tabela de User que se relacionara com a tabela de FIles'
     }); */
-    this.belongsTo(models.File, { foreignKey: 'avatar_id' });
+    this.belongsTo(models.File, { foreignKey: 'avatar_id', as: 'avatar' });
   }
 
   checkPassword(password) {
