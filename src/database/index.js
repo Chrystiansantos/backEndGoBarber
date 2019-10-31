@@ -1,4 +1,5 @@
 import Sequelize from 'sequelize';
+import mongoose from 'mongoose';
 import databaseConfig from '../config/database';
 // models
 import User from '../app/models/User';
@@ -10,6 +11,7 @@ const models = [User, File, Appointments];
 class Database {
   constructor() {
     this.init();
+    this.mongo();
   }
 
   // este metodo ficara responsavel por fazer a conexão e carregar os models
@@ -23,6 +25,18 @@ class Database {
     */
       // this.conection.models sera todos os models da minha aplicação
       .map(model => model.associate && model.associate(this.connection.models));
+  }
+
+  mongo() {
+    /* Aqui irei passar a url de conexão do mongo */
+    this.mongoConnection = mongoose.connect(
+      /* nomedobanco/localDoBanco/porta/nomeDaBaseDeDados */
+      'mongodb://localhost:27017/gobarber',
+      /* useNewUrlPaser: preciso utilizar pois estou usando este formato de url novo */
+      /* useFindAndModify uma maneira de como iremos utilizar o mongo quando estivermos
+      buscando registros */
+      { useNewUrlParser: true, useFindAndModify: true }
+    );
   }
 }
 
