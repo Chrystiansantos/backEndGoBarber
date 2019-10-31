@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { startOfHour, parseISO, isBefore, format } from 'date-fns';
+import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns';
 import pt from 'date-fns/locale/pt';
 import Appointment from '../models/Appointment';
 import User from '../models/User';
@@ -108,6 +108,28 @@ class AppointmentController {
     });
     /* Notificar o prestador de serviço */
     return res.json(appointments);
+  }
+
+  async delete(req, res) {
+    const appoitment = await Appointment.findByPk(req.params.id);
+    // verifico se o id do usuario, e diferente do user_id do agendamento
+    if (appoitment.user_id !== req.userId) {
+      return res.status(401).json({
+        error: 'You dont have permission to cancel this appointment',
+      });
+    }
+    /* subHours => subtrai uma quantidade de horas de uma respectiva data  */
+    // aqui removo 2 horas do horario do agendamento
+    const dateWithSub = subHours(appoitment.date, 2);
+
+    if (isBefore(dateWithSub, new Date())) {
+      return res
+        .status(401)
+        .json({ error: 'You can only cancel appoints 2 hours in advace' });
+    }
+    appoitment.canceled_at = new Date();
+    await appoitment.save();
+    return res.json(appoitment);
   }
 }
 export default new AppointmentController();

@@ -14,10 +14,25 @@ class NotificationController {
     const notifications = await Notification.find({
       user: req.userId,
     })
+      // sort sera responsavel por ordenar os valores retornados do mongo
       .sort({ createdAt: 'desc' })
+      // limit irá limitar a somente 20 registros por find
       .limit(20);
 
     return res.json(notifications);
+  }
+
+  async update(req, res) {
+    // const notification = await Notification.findById(req.params.id);
+
+    const notification = await Notification.findOneAndUpdate(
+      req.params.id,
+      {
+        read: true,
+      },
+      { new: true }
+    );
+    return res.json(notification);
   }
 }
 
