@@ -5,6 +5,7 @@ import Appointment from '../models/Appointment';
 import User from '../models/User';
 import File from '../models/File';
 import Notification from '../schemas/Notification';
+import Mail from '../../lib/Mail';
 
 class AppointmentController {
   async store(req, res) {
@@ -111,7 +112,15 @@ class AppointmentController {
   }
 
   async delete(req, res) {
-    const appoitment = await Appointment.findByPk(req.params.id);
+    const appoitment = await Appointment.findByPk(req.params.id, {
+      include: [
+        {
+          model: User,
+          as: 'provider',
+          attributes: ['name', 'email'],
+        },
+      ],
+    });
     // verifico se o id do usuario, e diferente do user_id do agendamento
     if (appoitment.user_id !== req.userId) {
       return res.status(401).json({
@@ -129,6 +138,13 @@ class AppointmentController {
     }
     appoitment.canceled_at = new Date();
     await appoitment.save();
+
+    await Mail.sendMail({
+      to: `${appoitment.provider.name} <${appoitment.provider.email}>`,
+      subject: 'Agendamento cancelado',
+      text: 'Voce tem um novo cancelamento',
+    });
+
     return res.json(appoitment);
   }
 }
