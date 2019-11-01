@@ -5,7 +5,8 @@ import Appointment from '../models/Appointment';
 import User from '../models/User';
 import File from '../models/File';
 import Notification from '../schemas/Notification';
-import Mail from '../../lib/Mail';
+import Queue from '../../lib/Queue';
+import CancellationMail from '../jobs/CancellationMail';
 
 class AppointmentController {
   async store(req, res) {
@@ -143,20 +144,11 @@ class AppointmentController {
     }
     appoitment.canceled_at = new Date();
     await appoitment.save();
-
-    await Mail.sendMail({
-      to: `${appoitment.provider.name} <${appoitment.provider.email}>`,
-      subject: 'Agendamento cancelado',
-      // template que estou utilizando
-      template: 'cancelation',
-      // aqui preciso informar todas as variaveis que meu template esta esperando
-      context: {
-        provider: appoitment.provider.name,
-        user: appoitment.user.name,
-        date: format(appoitment.date, "'dia' dd 'de' MMMM', às ' H:mm'h'", {
-          locale: pt,
-        }),
-      },
+    /* await Queue.add(key que declarei dentro de cancellationMail, {
+      dados a serem passado pro template
+    }) */
+    await Queue.add(CancellationMail.key, {
+      appoitment,
     });
 
     return res.json(appoitment);
