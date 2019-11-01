@@ -119,6 +119,11 @@ class AppointmentController {
           as: 'provider',
           attributes: ['name', 'email'],
         },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['name'],
+        },
       ],
     });
     // verifico se o id do usuario, e diferente do user_id do agendamento
@@ -142,7 +147,16 @@ class AppointmentController {
     await Mail.sendMail({
       to: `${appoitment.provider.name} <${appoitment.provider.email}>`,
       subject: 'Agendamento cancelado',
-      text: 'Voce tem um novo cancelamento',
+      // template que estou utilizando
+      template: 'cancelation',
+      // aqui preciso informar todas as variaveis que meu template esta esperando
+      context: {
+        provider: appoitment.provider.name,
+        user: appoitment.user.name,
+        date: format(appoitment.date, "'dia' dd 'de' MMMM', às ' H:mm'h'", {
+          locale: pt,
+        }),
+      },
     });
 
     return res.json(appoitment);
