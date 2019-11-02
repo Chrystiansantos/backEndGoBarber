@@ -31,6 +31,7 @@ class Queue {
   /* Este metodo ira adicionar emails na lista, para serem enviados */
   /*  add(fila que desejo adicionar o job,informaçoes que passaremos para o hadle montar o email) */
   add(queue, job) {
+    /* este .bee é a propriedade bee que acabei de criar logo acima */
     return this.queues[queue].bee.createJob(job).save();
   }
 
@@ -38,8 +39,14 @@ class Queue {
   processQueue() {
     jobs.forEach(job => {
       const { bee, handle } = this.queues[job.key];
-      bee.process(handle);
+      /* .process sera resoponsavel por processar a fila */
+      /* on vai ficar ouvindo caso falhe ele ira chamar o metodo handleFailure que criarei abaixo */
+      bee.on('failed', this.handleFailure).process(handle);
     });
+  }
+
+  handleFailure(job, err) {
+    console.log(`Queue ${job.queue.name}:FAILED`, err);
   }
 }
 
