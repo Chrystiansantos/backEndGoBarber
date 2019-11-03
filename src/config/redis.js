@@ -1,6 +1,6 @@
 export default {
   /* Aqui seria localhost */
-  host: '127.0.0.1',
+  host: process.env.REDIS_HOST,
   /* a porta que estamos utilizando  */
-  port: '6378',
+  port: process.env.REDIS_PORT,
 };

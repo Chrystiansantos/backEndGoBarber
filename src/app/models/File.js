@@ -10,7 +10,7 @@ class File extends Model {
           type: Sequelize.VIRTUAL,
           get() {
             // this ira se referir aos campos dentro do json
-            return `http://localhost:3333/files/${this.path}`;
+            return `${process.env.APP_URL}/files/${this.path}`;
           },
         },
       },

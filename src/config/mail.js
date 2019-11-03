@@ -1,14 +1,14 @@
 export default {
   // endereco
-  host: 'smtp.mailtrap.io',
+  host: process.env.MAIL_HOST,
   // porta
-  port: 2525,
+  port: process.env.MAIL_PORT,
   // se e seguro ou nao
   secure: false,
   // usuario e senha, autenticação como se fosse para enviar um email
   auth: {
-    user: '4448e9a39c8fdf',
-    pass: 'dc5a96a6a8e59a',
+    user: process.env.MAIL_HOST,
+    pass: process.env.MAIL_PASS,
   },
   /* aqui abaixo sera definido algumas configuraçoes padrao que sera utilizada
    para todo envio de email */

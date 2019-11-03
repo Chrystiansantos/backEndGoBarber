@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import express from 'express';
 import path from 'path';
 import * as Sentry from '@sentry/node';
@@ -33,9 +35,13 @@ class App {
   }
 
   exceptionHandler() {
+    // somente irei retornar as informaçoes de erro caso esteja em um ambiente de dev
     this.server.use(async (err, req, res, next) => {
-      const erros = await new Youch(err, req).toJSON();
-      return res.status(500).json(erros);
+      if (process.env.NODE_ENV === 'development') {
+        const erros = await new Youch(err, req).toJSON();
+        return res.status(500).json(erros);
+      }
+      return res.status(500).json({ error: 'Internal server error' });
     });
   }
 }
